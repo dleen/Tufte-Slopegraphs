@@ -64,20 +64,27 @@ print_points_in_column <- function(height,
     if(substr(th,1,1) == '0') th <- substr(th,1,4)
     else if(substr(th,2,2) == '.') th <- substr(th,1,1)
     else th <- substr(th,1,2)
-#     grid.points(x=unit(0.1,"npc"),
-#                 y=unit(height,"npc")
-#     )
     grid.text(th,
               x=unit(0.1,"npc"),
               y=unit(height,"npc"))    
-    grid.lines(x=unit.c(unit(1.1, "strwidth", th) + unit(0.1,"npc"),
-                        unit(0.9,"npc")),
+    grid.lines(x=unit.c(unit(1, "strwidth", th) + unit(0.1,"npc"),
+                        unit(1,"npc")),
                y=unit(c(height,h_next),"npc"))
   }
   else {
-    grid.points(x=unit(0.1,"npc"),
-                y=unit(1 + height,"npc")
-    )    
+    th <- toString(height)
+    if(substr(th,2,2) == '0') th <- substr(th,1,4)
+    else if(substr(th,3,3) == '.') th <- substr(th,1,2)
+    else th <- substr(th,1,3)
+    grid.text(th,
+              x=unit(0.1,"npc"),
+              y=unit(1 + height,"npc"))
+    grid.lines(x=unit.c(unit(1, "strwidth", th) + unit(0.1,"npc"),
+                        unit(1,"npc")),
+                y=unit(c(1 + height,if(h_next < 0) 1 + h_next else h_next),"npc"))
+#     grid.points(x=unit(0.1,"npc"),
+#                 y=unit(1 + height,"npc")
+#     )    
   }
   
   upViewport() 
