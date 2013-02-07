@@ -33,8 +33,8 @@ selected_airports <- selected_airports[,c(1,2,3,5,4)]
 # Dimensions #
 ##############
 # pdf size
-width <- 8
-height <- 8
+width <- 10
+height <- 10
 
 # The column names for the slope graph
 # The last column is the same as the first
@@ -50,7 +50,6 @@ colwidths <- unit(rep(1.5, length(cols)),
                   as.vector(rep("strwidth", length(cols))),
                   data=as.list(cols))
 
-
 # The heights of the rows
 # We take the maximum value that occurs along the row
 # and subtract the minimum value along the row to get 
@@ -58,10 +57,10 @@ colwidths <- unit(rep(1.5, length(cols)),
 row_min_max_diff <- apply(as.matrix(selected_airports[,2:5], rownames.force=FALSE), 
                           MARGIN=1, FUN=single_row_height)
 total_height <- abs(sum(row_min_max_diff))
-h_factor <- height / total_height
+h_factor <- 1 / total_height
 row_mmd <- h_factor * abs(row_min_max_diff)
 rowheights <- unit(c(2, row_mmd),
-                   as.vector(c("strheight", rep("inches", length(row_mmd)))),
+                   as.vector(c("strheight", rep("npc", length(row_mmd)))),
                    data=as.list(cols[1], rep(NULL, length(row_mmd))))
 
 
@@ -69,7 +68,7 @@ rowheights <- unit(c(2, row_mmd),
 # Graphics #
 ############
 
-filename <- "prim.pdf"
+#filename <- "prim.pdf"
 
 #pdf(filename, width=width, height=height)
 plot.new()
@@ -81,7 +80,11 @@ overlay <- grid.layout(nrow=nrows + 1,
                        heights=rowheights,
                        respect=TRUE)
 
-pushViewport(viewport(layout=overlay))
+pushViewport(viewport(layout=overlay,
+                      width = unit(1, "npc"), 
+                      height = unit(0.75, "npc"),
+                      xscale=c(0,1),
+                      yscale=c(0,1)))
 
 # List of the airports for convenience
 airports <- selected_airports[,1]
