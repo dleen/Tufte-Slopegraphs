@@ -2,14 +2,19 @@
 write_noun_names <- function(name,
                              row,
                              col,
-                             txt_pos) {
+                             txt_pos,
+                             max,
+                             min) {
+  require(grid)
   pushViewport(viewport(layout.pos.row=row,
                         layout.pos.col=col,
+                        width=1,
+                        height=max-min,
                         xscale=c(0,1),
-                        yscale=c(0,1),
+                        yscale=c(min,max),
                         gp=gpar(fontsize=12),
                         name="slope_row",
-                        clip="on")
+                        clip="off")
   )
   
   grid.text(name,
@@ -23,6 +28,7 @@ write_noun_names <- function(name,
 # The names of the columns
 write_column_names <- function(name, 
                                col) {
+  
   pushViewport(viewport(layout.pos.row=1,
                         layout.pos.col=col,
                         xscale=c(0,1),
@@ -47,45 +53,37 @@ write_column_names <- function(name,
 }
 
 # Print the data points in each column
-print_points_in_column <- function(height,
+print_points_in_column <- function(label,
+                                   height,
                                    h_next,
                                    row,
-                                   col) {
+                                   col,
+                                   max,
+                                   min) {
+  require(grid)
   pushViewport(viewport(layout.pos.row=row,
                         layout.pos.col=col,
                         xscale=c(0,1),
-                        yscale=c(0,1),
+                        yscale=c(min,max),
                         gp=gpar(fontsize=10),
                         name="arf",
                         clip="off")
   )
-  if( height >= 0) {
-    th <- toString(height)
-    if(substr(th,1,1) == '0') th <- substr(th,1,4)
-    else if(substr(th,2,2) == '.') th <- substr(th,1,1)
-    else th <- substr(th,1,2)
-    grid.text(th,
-              x=unit(0.1,"npc"),
-              y=unit(height,"npc"))    
-    grid.lines(x=unit.c(unit(1, "strwidth", th) + unit(0.1,"npc"),
-                        unit(1,"npc")),
-               y=unit(c(height,h_next),"npc"))
-  }
-  else {
-    th <- toString(height)
-    if(substr(th,2,2) == '0') th <- substr(th,1,4)
-    else if(substr(th,3,3) == '.') th <- substr(th,1,2)
-    else th <- substr(th,1,3)
-    grid.text(th,
-              x=unit(0.1,"npc"),
-              y=unit(1 + height,"npc"))
-    grid.lines(x=unit.c(unit(1, "strwidth", th) + unit(0.1,"npc"),
-                        unit(1,"npc")),
-                y=unit(c(1 + height,if(h_next < 0) 1 + h_next else h_next),"npc"))
-#     grid.points(x=unit(0.1,"npc"),
-#                 y=unit(1 + height,"npc")
-#     )    
-  }
+  th <- as.integer(label)
+#  th <- substr(th,1,4)
+#   if(substr(th,1,1) == '-') {
+#     if(substr(th,2,2) == '0') th <- substr(th,1,)
+#   }
+#   else if(substr(th,1,1) == '0') th <- substr(th,1,4)
+#   else if(substr(th,2,2) == '.') th <- substr(th,1,1)
+#   else th <- substr(th,1,2)
+  grid.text(th,
+            x=unit(0.5,"npc"),
+            y=unit(height,"npc"))    
+  #     grid.lines(x=unit.c(unit(1, "strwidth", th) + unit(0.1,"npc"),
+  #                         unit(1,"npc")),
+  #                y=unit(c(height,h_next),"npc"))
+
   
   upViewport() 
 }

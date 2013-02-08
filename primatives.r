@@ -12,7 +12,8 @@ source('./graphics_functions.r')
 
 flight_data <- read.csv('../data/average_gate_runway_delay_by_dep_airport.csv')
 
-popular_airports <- c('KJFK', 'KSEA', 'KLAX', 'KDCA', 'KBOS', 'KSFO', 'KABE', 'KABI', 'KADW', 'KSFB')
+popular_airports <- c('KJFK', 'KSEA', 'KLAX', 'KDCA', 'KBOS', 
+                      'KSFO', 'KABE', 'KABI', 'KADW', 'KSFB')
 
 selected_airports <- 
   flight_data[flight_data$departure_airport_icao_code %in% popular_airports,]
@@ -33,8 +34,8 @@ selected_airports <- selected_airports[,c(1,2,3,5,4)]
 # Dimensions #
 ##############
 # pdf size
-width <- 10
-height <- 10
+width <- 20
+height <- 15
 
 # The column names for the slope graph
 # The last column is the same as the first
@@ -54,23 +55,16 @@ colwidths <- unit(rep(1.5, length(cols)),
 # We take the maximum value that occurs along the row
 # and subtract the minimum value along the row to get 
 # the necessary row height
-row_min_max_diff <- apply(as.matrix(selected_airports[,2:5], rownames.force=FALSE), 
-                          MARGIN=1, FUN=single_row_height)
-total_height <- abs(sum(row_min_max_diff))
-h_factor <- 1 / total_height
-row_mmd <- h_factor * abs(row_min_max_diff)
-rowheights <- unit(c(2, row_mmd),
-                   as.vector(c("strheight", rep("npc", length(row_mmd)))),
-                   data=as.list(cols[1], rep(NULL, length(row_mmd))))
+rowheights <- row_height_function(selected_airports)
 
 
 ############
 # Graphics #
 ############
 
-#filename <- "prim.pdf"
+filename <- "prim.pdf"
+pdf(filename, width=width, height=height)
 
-#pdf(filename, width=width, height=height)
 plot.new()
 
 # Graphics go here
@@ -84,28 +78,33 @@ pushViewport(viewport(layout=overlay,
                       width = unit(1, "npc"), 
                       height = unit(0.75, "npc"),
                       xscale=c(0,1),
-                      yscale=c(0,1)))
+                      yscale=c(0,1)
+                      ))
 
 # List of the airports for convenience
 airports <- selected_airports[,1]
 
-for(i in 1:nrows) {
-  # If the left hand side value is greater than the right
-  # hand side value put the left name higher than the right
-  # otherwise right higher than the left
-  if(selected_airports[i,2] >= selected_airports[i,5]) {
-    # Left hand side noun list
-    write_noun_names(airports[i], i + 1, 1, 0.85)
-    # Right hand side noun list
-    write_noun_names(airports[i], i + 1, length(cols), 0.15)
-  } 
-  else {
-    # Left hand side noun list
-    write_noun_names(airports[i], i + 1, 1, 0.15)
-    # Right hand side noun list
-    write_noun_names(airports[i], i + 1, length(cols), 0.85)    
-  }
-}
+####################
+# Create the plots #
+####################
+
+# for(i in 1:nrows) {
+#   # If the left hand side value is greater than the right
+#   # hand side value put the left name higher than the right
+#   # otherwise right higher than the left
+#   if(selected_airports[i,2] >= selected_airports[i,5]) {
+#     # Left hand side noun list
+#     write_noun_names(airports[i], i + 1, 1, 0.85)
+#     # Right hand side noun list
+#     write_noun_names(airports[i], i + 1, length(cols), 0.15)
+#   } 
+#   else {
+#     # Left hand side noun list
+#     write_noun_names(airports[i], i + 1, 1, 0.15)
+#     # Right hand side noun list
+#     write_noun_names(airports[i], i + 1, length(cols), 0.85)    
+#   }
+# }
 
 
 for(i in 1:length(cols)) {
@@ -116,11 +115,18 @@ for(i in 1:nrows) {
   row <- as.matrix(selected_airports[i,2:5])
   total <- abs(sum(row))
   h <- row / total
-  pheight <- cumsum(h)
+  
+  ma <- max(h)
+  mi <- min(h)
+  
+  write_noun_names(substr(airports[i],2,4), i + 1, 1, h[1], ma, mi)
+  write_noun_names(substr(airports[i],2,4), i + 1, length(cols), h[length(h)], ma, mi)
+  
   for(j in 1:(length(h) - 1)) {
-    print_points_in_column(pheight[j], pheight[j + 1], i + 1, j + 1)
+    print_points_in_column(row[j], h[j], h[j + 1], i + 1, j + 1, ma, mi)
   }
+  print_points_in_column(row[length(h)], h[length(h)], h[length(h) - 1], i + 1, length(h) + 1, ma, mi)
+  
 }
 
-
-#dev.off()
+dev.off()
