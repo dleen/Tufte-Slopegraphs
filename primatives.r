@@ -30,6 +30,8 @@ colnames(selected_airports)[5] <- "Arrival Runway Delay,\n minutes"
 
 selected_airports <- selected_airports[,c(1,2,3,5,4)]
 
+# selected_airports <- selected_airports[sample(nrow(selected_airports)),]
+
 ##############
 # Dimensions #
 ##############
@@ -47,7 +49,7 @@ cols <- c(colnames(selected_airports),
 nrows = nrow(selected_airports)
 
 # The widths of the columns
-colwidths <- unit(rep(1.5, length(cols)),
+colwidths <- unit(rep(1, length(cols)),
                   as.vector(rep("strwidth", length(cols))),
                   data=as.list(cols))
 
@@ -88,25 +90,6 @@ airports <- selected_airports[,1]
 # Create the plots #
 ####################
 
-# for(i in 1:nrows) {
-#   # If the left hand side value is greater than the right
-#   # hand side value put the left name higher than the right
-#   # otherwise right higher than the left
-#   if(selected_airports[i,2] >= selected_airports[i,5]) {
-#     # Left hand side noun list
-#     write_noun_names(airports[i], i + 1, 1, 0.85)
-#     # Right hand side noun list
-#     write_noun_names(airports[i], i + 1, length(cols), 0.15)
-#   } 
-#   else {
-#     # Left hand side noun list
-#     write_noun_names(airports[i], i + 1, 1, 0.15)
-#     # Right hand side noun list
-#     write_noun_names(airports[i], i + 1, length(cols), 0.85)    
-#   }
-# }
-
-
 for(i in 1:length(cols)) {
   write_column_names(cols[i], i)
 }
@@ -123,9 +106,14 @@ for(i in 1:nrows) {
   write_noun_names(substr(airports[i],2,4), i + 1, length(cols), h[length(h)], ma, mi)
   
   for(j in 1:(length(h) - 1)) {
-    print_points_in_column(row[j], h[j], h[j + 1], i + 1, j + 1, ma, mi)
+    print_points_in_column(row[j], h[j], i + 1, j + 1, ma, mi)
   }
-  print_points_in_column(row[length(h)], h[length(h)], h[length(h) - 1], i + 1, length(h) + 1, ma, mi)
+  print_points_in_column(row[length(h)], h[length(h)], i + 1, length(h) + 1, ma, mi)
+  
+  for(j in 1:(length(h) - 1)) {
+    print_lines_between_columns(row[j], h[j], h[j + 1], i + 1, c(j + 1, j + 2), ma, mi)
+  }
+  
   
 }
 
