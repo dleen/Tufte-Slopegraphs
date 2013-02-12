@@ -5,8 +5,8 @@ write_title <- function(title,
   pushViewport(viewport(layout.pos.row=row,
                         layout.pos.col=cols,
                         xscale=c(0,1),
-                        yscale=c(0,unit(1, "strheight", title)),
-                        gp=gpar(fontsize=16),
+                        yscale=c(0,1),
+                        gp=gpar(fontsize=14),
                         name="first_slope_row",
                         clip="off")
   )
@@ -27,7 +27,7 @@ write_column_names <- function(name,
   pushViewport(viewport(layout.pos.row=row,
                         layout.pos.col=col,
                         xscale=c(0,1),
-                        yscale=c(0,1),
+                        yscale=c(0,unit(1, "strwidth", name)),
                         gp=gpar(fontsize=12),
                         name="first_slope_row",
                         clip="off")
@@ -35,12 +35,12 @@ write_column_names <- function(name,
   
   grid.text(name,
             x=unit(0.5,"native"),
-            y=unit(0.8,"native")
+            y=unit(1,"native")
   )
   
   if(col > 1 & col < length(cols)) {
-    grid.lines(x=unit(c(0.15,0.85),"npc"),
-               y=unit(c(0.3,0.3),"npc"),
+    grid.lines(x=unit(c(0.15,0.85),"native"),
+               y=unit(c(0.5,0.5),"native"),
                gp=gpar(lwd=1,alpha=0.25))
   }
   
@@ -53,7 +53,8 @@ write_noun_names <- function(name,
                              col,
                              txt_pos,
                              max,
-                             min) {
+                             min,
+                             truth=F) {
   require(grid)
   pushViewport(viewport(layout.pos.row=row,
                         layout.pos.col=col,
@@ -64,10 +65,19 @@ write_noun_names <- function(name,
                         clip="off")
   )
   
-  grid.text(name,
-            x=unit(0.5,"npc"),
-            y=unit(txt_pos,"native")
-  )
+  if(truth) {
+    grid.text(name,
+              x=unit(0.5,"native"),
+              y=unit(txt_pos,"native") - unit(0.75, "strheight", name)
+    )    
+  }
+  else {
+    grid.text(name,
+              x=unit(0.5,"native"),
+              y=unit(txt_pos,"native")
+    )    
+  }
+
   
   upViewport()
 }
@@ -78,7 +88,8 @@ print_points_in_column <- function(label,
                                    row,
                                    col,
                                    max,
-                                   min) {
+                                   min,
+                                   shift=F) {
   require(grid)
   pushViewport(viewport(layout.pos.row=row,
                         layout.pos.col=col,
@@ -90,9 +101,16 @@ print_points_in_column <- function(label,
   )
   th <- as.integer(label)
 
-  grid.text(th,
-            x=unit(0.5,"npc"),
-            y=unit(height,"native"))    
+  if(shift) {
+    grid.text(th,
+              x=unit(0.5,"native"),
+              y=(unit(height,"native") + unit(1.5, "strheight", toString(label)))) 
+  } 
+  else {
+    grid.text(th,
+              x=unit(0.5,"native"),
+              y=unit(height,"native"))    
+  }
   
   upViewport() 
 }
@@ -104,23 +122,41 @@ print_lines_between_columns <- function(label,
                                         row,
                                         col,
                                         max,
-                                        min) {
+                                        min,
+                                        shift1=F,
+                                        shift2=F) {
   require(grid)
   pushViewport(viewport(layout.pos.row=row,
                         layout.pos.col=col,
                         xscale=c(0,1),
                         yscale=c(min, max),
                         gp=gpar(fontsize=10),
-                        name="arf",
+                        name="slope lines",
                         clip="off")
   )
   th <- as.integer(label)
   th <- toString(th)
   
-  grid.lines(x=unit.c(unit(0.25,"npc") + unit(1, "strwidth", '888'),
-                      unit(0.75,"npc") - unit(1, "strwidth", '888')),
-             y=unit.c(unit(height,"native"),
-                      unit(h_next,"native")))
+  if(shift1) {
+    grid.lines(x=unit.c(unit(0.25,"native") + unit(1, "strwidth", '888'),
+                        unit(0.75,"native") - unit(1, "strwidth", '888')),
+               y=unit.c(unit(height,"native"),
+                        unit(h_next,"native") + unit(1.5, "strheight", toString(label))))    
+  }
+  else if(shift2) {
+    grid.lines(x=unit.c(unit(0.25,"native") + unit(1, "strwidth", '888'),
+                        unit(0.75,"native") - unit(1, "strwidth", '888')),
+               y=unit.c(unit(height,"native") + unit(1.5, "strheight", toString(label)),
+                        unit(h_next,"native")))        
+  }
+  else {
+    grid.lines(x=unit.c(unit(0.25,"native") + unit(1, "strwidth", '888'),
+                        unit(0.75,"native") - unit(1, "strwidth", '888')),
+               y=unit.c(unit(height,"native"),
+                        unit(h_next,"native")))    
+  }
+  
+
   
   
   upViewport() 
