@@ -10,7 +10,7 @@ source('./graphics_functions.r')
 # Data munging #
 ################
 
-flight_data <- read.csv('../data/average_gate_runway_delay_by_dep_airport.csv')
+flight_data <- read.csv('./data/average_gate_runway_delay_by_dep_airport.csv')
 
 popular_airports <- c('KJFK', 'KSEA', 'KLAX', 'KDCA', 'KBOS', 
                       'KSFO', 'KABE', 'KABI', 'KADW', 'KSFB')
@@ -71,7 +71,7 @@ pdf(filename, width=width, height=height)
 plot.new()
 
 # Graphics go here
-overlay <- grid.layout(nrow=nrows + 1,
+overlay <- grid.layout(nrow=nrows + 2,
                        ncol=length(cols),
                        widths=colwidths,
                        heights=rowheights,
@@ -91,8 +91,11 @@ airports <- selected_airports[,1]
 # Create the plots #
 ####################
 
+title <- 'Blah blah blah. This is a\n long title\n\n'
+write_title(title, 1, 1:length(cols))
+
 for(i in 1:length(cols)) {
-  write_column_names(cols[i], i)
+  write_column_names(cols[i], 2, i)
 }
 
 for(i in 1:nrows) {
@@ -103,16 +106,19 @@ for(i in 1:nrows) {
   ma <- max(h)
   mi <- min(h)
   
-  write_noun_names(substr(airports[i],2,4), i + 1, 1, h[1], ma, mi)
-  write_noun_names(substr(airports[i],2,4), i + 1, length(cols), h[length(h)], ma, mi)
+  offset <- 2
+  alpha <- 0.8
+  
+  write_noun_names(substr(airports[i],2,4), row = i + offset, 1, alpha * h[1], ma, mi)
+  write_noun_names(substr(airports[i],2,4), row = i + offset, length(cols), alpha * h[length(h)], ma, mi)
   
   for(j in 1:(length(h) - 1)) {
-    print_points_in_column(row[j], h[j], i + 1, j + 1, ma, mi)
+    print_points_in_column(row[j], alpha * h[j], row = i + offset, j + 1, ma, mi)
   }
-  print_points_in_column(row[length(h)], h[length(h)], i + 1, length(h) + 1, ma, mi)
+  print_points_in_column(row[length(h)], alpha * h[length(h)], row = i + offset, length(h) + 1, ma, mi)
   
   for(j in 1:(length(h) - 1)) {
-    print_lines_between_columns(row[j], h[j], h[j + 1], i + 1, c(j + 1, j + 2), ma, mi)
+    print_lines_between_columns(row[j], alpha * h[j], alpha * h[j + 1], row = i + offset, c(j + 1, j + 2), ma, mi)
   }
   
   

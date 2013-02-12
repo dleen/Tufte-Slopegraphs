@@ -1,8 +1,30 @@
+write_title <- function(title, 
+                        row, 
+                        cols) {
+  require(grid)  
+  pushViewport(viewport(layout.pos.row=row,
+                        layout.pos.col=cols,
+                        xscale=c(0,1),
+                        yscale=c(0,unit(1, "strheight", title)),
+                        gp=gpar(fontsize=16),
+                        name="first_slope_row",
+                        clip="off")
+  )
+  
+  grid.text(title,
+            x=unit(0.5,"native"),
+            y=unit(1,"native")
+  )
+  
+  upViewport() 
+}
+
 # The names of the columns
-write_column_names <- function(name, 
+write_column_names <- function(name,
+                               row,
                                col) {
   
-  pushViewport(viewport(layout.pos.row=1,
+  pushViewport(viewport(layout.pos.row=row,
                         layout.pos.col=col,
                         xscale=c(0,1),
                         yscale=c(0,1),
