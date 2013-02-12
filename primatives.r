@@ -42,14 +42,15 @@ height <- 15
 # The column names for the slope graph
 # The last column is the same as the first
 # by design
-cols <- c(colnames(selected_airports), 
-          colnames(selected_airports)[1])
+# cols <- c(colnames(selected_airports), 
+#           colnames(selected_airports)[1])
+cols <- c("",colnames(selected_airports)[2:5],"")
 
 # The number of rows we need
 nrows = nrow(selected_airports)
 
 # The widths of the columns
-colwidths <- unit(rep(1, length(cols)),
+colwidths <- unit(rep(1.5, length(cols)),
                   as.vector(rep("strwidth", length(cols))),
                   data=as.list(cols))
 

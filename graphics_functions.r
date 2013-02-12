@@ -12,8 +12,8 @@ write_column_names <- function(name,
   )
   
   grid.text(name,
-            x=unit(0.5,"npc"),
-            y=unit(0.8,"npc")
+            x=unit(0.5,"native"),
+            y=unit(0.8,"native")
   )
   
   if(col > 1 & col < length(cols)) {
