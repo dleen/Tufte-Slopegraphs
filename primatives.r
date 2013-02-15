@@ -56,12 +56,9 @@ height <- 10
 
 title <- 'The breakdown of flight delays by departure and arrival components.\n'
 
-
 # The column names for the slope graph
 # The last column is the same as the first
-# by design
-# cols <- c(colnames(selected_airports), 
-#           colnames(selected_airports)[1])
+# and both are blank
 cols <- c("",colnames(selected_airports)[2:5],"")
 
 # The number of rows we need
@@ -78,6 +75,8 @@ colwidths <- unit(c(0.2,1,1.1,1,1.2,0.2),
 # the necessary row height
 rowheights <- row_height_function(selected_airports, title, cols[2])
 
+# List of the airports for convenience
+airports <- selected_airports[,1]
 
 ############
 # Graphics #
@@ -88,7 +87,7 @@ pdf(filename, width=width, height=height)
 
 plot.new()
 
-# Graphics go here
+# Main graphic overlay
 overlay <- grid.layout(nrow=nrows + 2,
                        ncol=length(cols),
                        widths=colwidths,
@@ -99,63 +98,78 @@ pushViewport(viewport(layout=overlay,
                       width = unit(1, "native"), 
                       height = unit(1, "native"),
                       xscale=c(0,1),
-                      yscale=c(0,1)
-                      ))
-
-# List of the airports for convenience
-airports <- selected_airports[,1]
+                      yscale=c(0,1)))
 
 ####################
 # Create the plots #
 ####################
 
-# mySum = t(apply(selected_airports[,2:5], 1, cumsum))
-
+# Write the title
 write_title(title, 1, 1:length(cols))
 
+# Write the column names
 for(i in 1:length(cols)) {
   write_column_names(cols[i], 2, i)
 }
 
+# 
 for(i in 1:nrows) {
+  # Each row
   row <- as.matrix(selected_airports[i,2:5])
-#   row <- as.matrix(mySum[i,])
+  # Sum of row
   total <- abs(sum(row))
+  # Normalize
   h <- row / total
+  # Initialize h_next to current height
+  # for safety
   h_next <- h
-  
-  if(i < nrows) {
-    row_next <- as.matrix(selected_airports[i + 1,2:5])
-    total <- abs(sum(row_next))
-    h_next <- row_next / total
-    max_ind_next <- which.max(h_next)
-    min_ind_next <- which.min(h_next)
-    
-  }
-  
+  # Max height
   ma <- max(h)
+  # Where max height occurs
   max_ind <- which.max(h)
+  # Similarly...
   mi <- min(h)
   min_ind <- which.min(h)
   
-  truth <- min_ind == max_ind_next
+  # If we're not at the last row:
+  if(i < nrows) {
+    # Load the next row
+    row_next <- as.matrix(selected_airports[i + 1,2:5])
+    # Repeat previous quantities
+    total <- abs(sum(row_next))
+    h_next <- row_next / total
+    max_ind_next <- which.max(h_next)
+    min_ind_next <- which.min(h_next)  
+  }
   
+  # Keep track of whether the minimum value
+  # of this row coincides with the maximum
+  # value of the next row
+  adjust <- min_ind == max_ind_next
+  
+  # Skip 2 rows: title, colnames
   offset <- 2
-  alpha <- 1
   
-  write_noun_names(substr(airports[i],2,4), row = i + offset, 1, alpha * h[1], ma, mi)
-  write_noun_names(substr(airports[i],2,4), row = i + offset, length(cols), alpha * h[length(h)], ma, mi, truth)
+  # Write the airport names
+  # In the left column
+  write_noun_names(substr(airports[i],2,4), row = i + offset, 
+                   1, h[1], ma, mi)
+  # In the right column
+  write_noun_names(substr(airports[i],2,4), row = i + offset, 
+                   length(cols), h[length(h)], ma, mi, adjust)
   
-  for(j in 1:(length(h) - 1)) {
-      print_points_in_column(row[j], alpha * h[j], row = i + offset, j + 1, ma, mi, j == min_ind && truth)
+  # For each point in the row:
+  for(j in 1:(length(h))) {
+      # Print the point and adjust if needed
+      print_points_in_column(row[j], h[j], row = i + offset, 
+                             j + 1, ma, mi, j == min_ind && adjust)
   }
-  print_points_in_column(row[length(h)], alpha * h[length(h)], row = i + offset, length(h) + 1, ma, mi)
-  
   for(j in 1:(length(h) - 1)) {
-    print_lines_between_columns(row[j], alpha * h[j], alpha * h[j + 1], row = i + offset, c(j + 1, j + 2), ma, mi, j == (min_ind - 1) && truth, j == min_ind && truth)
+    print_lines_between_columns(row[j], h[j], h[j + 1], row = i + offset, 
+                                c(j + 1, j + 2), # Print across two columns
+                                ma, mi, j == (min_ind - 1) && adjust, 
+                                j == min_ind && adjust)
   }
-  
-  
 }
 
 dev.off()
